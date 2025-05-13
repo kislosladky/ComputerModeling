@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+    <meta charset="UTF-8"/>
+</head>
+<body>
+<div id="plot"></div>
+
+<script>
+    fetch('trajectories.json')
+        .then(response => response.json())
+        .then(data => {
+            const body1 = data.body_1;
+            const body2 = data.body_2;
+            const body3 = data.body_3;
+
+            const totalFrames = Math.min(body1.length, body2.length, body3.length);
+            const frames = [];
+
+            for (let i = 0; i < totalFrames; i++) {
+                frames.push({
+                    name: `frame${i}`,
+                    data: [
+                        {
+                            x: body1.slice(0, i + 1).map(p => p.x),
+                            y: body1.slice(0, i + 1).map(p => p.y),
+                            mode: 'lines+markers',
+                            marker: { size: 6, color: 'red' },
+                            line: { color: 'red', size: 2 }
+                        },
+                        {
+                            x: body2.slice(0, i + 1).map(p => p.x),
+                            y: body2.slice(0, i + 1).map(p => p.y),
+                            mode: 'lines+markers',
+                            marker: { size: 6, color: 'blue' },
+                            line: { color: 'blue', size: 2 }
+                        },
+                        {
+                            x: body3.slice(0, i + 1).map(p => p.x),
+                            y: body3.slice(0, i + 1).map(p => p.y),
+                            mode: 'lines+markers',
+                            marker: { size: 6, color: 'green' },
+                            line: { color: 'green', size: 2 }
+                        }
+                    ]
+                });
+            }
+
+            const layout = {
+                title: 'Анимация движения космических тел',
+                xaxis: { title: 'X', autorange: true },
+                yaxis: { title: 'Y', autorange: true, scaleanchor: 'x' },
+                updatemenus: [{
+                    type: 'buttons',
+                    showactive: false,
+                    buttons: [{
+                        label: 'Начать анимашку',
+                        method: 'animate',
+                        args: [null, {
+                            frame: { duration: 10, redraw: false },
+                            transition: { duration: 50 },
+                            fromcurrent: true
+                        }]
+                    }]
+                }]
+            };
+
+            const initialData = [
+                {
+                    x: [body1[0].x],
+                    y: [body1[0].y],
+                    mode: 'lines+markers',
+                    marker: { size: 6, color: 'red' },
+                    line: { color: 'red' },
+                    name: 'Сияшка'
+                },
+                {
+                    x: [body2[0].x],
+                    y: [body2[0].y],
+                    mode: 'lines+markers',
+                    marker: { size: 6, color: 'blue' },
+                    line: { color: 'blue' },
+                    name: 'Планета'
+                },
+                {
+                    x: [body3[0].x],
+                    y: [body3[0].y],
+                    mode: 'lines+markers',
+                    marker: { size: 6, color: 'green' },
+                    line: { color: 'green' },
+                    name: 'Котлета'
+                }
+            ];
+
+            Plotly.newPlot('plot', initialData, layout).then(() => {
+                Plotly.addFrames('plot', frames);
+            });
+        })
+        .catch(error => {
+            console.error('Ошибка загрузки trajectories.json:', error);
+        });
+</script>
+</body>
+</html>
