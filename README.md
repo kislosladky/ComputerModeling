@@ -1,2 +1,2 @@
-# ComputerModelling
+# ComputerModeling
 Репозиторий с проектом по предмету Компьютерное моделирование
